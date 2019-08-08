@@ -1,0 +1,66 @@
+library(ggplot2)
+library(dplyr)
+require(maps)
+require(viridis)
+theme_set(
+  theme_void()
+)
+
+world_map <- map_data("world")
+ggplot(world_map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill="lightgray", colour = "white")
+
+some.eu.countries <- c(
+  "Portugal", "Spain", "France", "Switzerland", "Germany",
+  "Austria", "Belgium", "UK", "Netherlands",
+  "Denmark", "Poland", "Italy",
+  "Croatia", "Slovenia", "Hungary", "Slovakia",
+  "Czech republic"
+)
+# Retrievethe map data
+some.eu.maps <- map_data("world", region = some.eu.countries)
+
+region.lab.data <- some.eu.maps %>%
+  group_by(region) %>%
+  summarise(long = mean(long), lat = mean(lat))
+
+ggplot(some.eu.maps, aes(x = long, y = lat)) +
+  geom_polygon(aes( group = group, fill = region))+
+  geom_text(aes(label = region), data = region.lab.data,  size = 3, hjust = 0.5)+
+  scale_fill_viridis_d()+
+  theme_void()+
+  theme(legend.position = "none")
+
+install.packages("WHO")
+library("WHO")
+library("dplyr")
+life.exp <- get_data("WHOSIS_000001")             # Retrieve the data
+life.exp <- life.exp %>%
+  filter(year == 2015 & sex == "Both sexes") %>%  # Keep data for 2015 and for both sex
+  select(country, value) %>%                      # Select the two columns of interest
+  rename(region = country, lifeExp = value) %>%   # Rename columns
+  # Replace "United States of America" by USA in the region column
+  mutate(
+    region = ifelse(region == "United States of America", "USA", region)
+  )
+
+world_map <- map_data("world")
+life.exp.map <- left_join(life.exp, world_map, by = "region")
+
+ggplot(life.exp.map, aes(long, lat, group = group))+
+  geom_polygon(aes(fill = lifeExp ), color = "white")+
+  scale_fill_viridis_c(option = "C")
+
+#shaded according to the value
+# Prepare the USArrests data
+library(dplyr)
+arrests <- USArrests
+arrests$region <- tolower(rownames(USArrests))
+head(arrests)
+
+states_map <- map_data("state")
+arrests_map <- left_join(states_map, arrests, by = "region")
+ggplot(arrests_map, aes(long, lat, group = group))+
+  geom_polygon(aes(fill = UrbanPop), color = "white")+
+  scale_fill_viridis_c(option = "C")
+
