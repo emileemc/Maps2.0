@@ -66,7 +66,7 @@ ggplot(arrests_map, aes(long, lat, group = group))+
 
 
 
-
+#most up to date
 library(stringr)
 states<-as.data.frame(state.x77)
 statesfact$region <- tolower(rownames(states))
