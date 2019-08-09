@@ -77,3 +77,4 @@ ggplot(fact_join, aes(long, lat, group = group))+
   geom_polygon(aes(fill = Illiteracy), color = "white")+
   scale_fill_viridis_c(option = "C")
 
+#https://www.rdocumentation.org/packages/datasets/versions/3.6.1
